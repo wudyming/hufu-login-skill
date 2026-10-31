@@ -3,12 +3,11 @@ import { resolve } from 'node:path';
 import { readConfig, verifyAndExchange } from './core.mjs';
 import { startLogin } from './server.mjs';
 const { values } = parseArgs({ options: { config: { type: 'string' }, output: { type: 'string', default: 'session.local.json' }, timeout: { type: 'string', default: '300' }, help: { type: 'boolean' } } });
-if (values.help) { console.log('node scripts/login.mjs --config config.local.json [--output session.local.json] [--timeout 300]'); process.exit(0); }
+if (values.help) { console.log('node scripts/login.mjs [--config config.local.json] [--output session.local.json] [--timeout 300]'); process.exit(0); }
 try {
-  if (!values.config) throw new Error('需要 --config 配置文件');
   const timeoutMs = Number(values.timeout) * 1000;
   if (!Number.isFinite(timeoutMs) || timeoutMs < 1000 || timeoutMs > 3600000) throw new Error('timeout 应为 1–3600 秒');
-  const config = await readConfig(resolve(values.config));
+  const config = await readConfig(values.config ? resolve(values.config) : undefined);
   const { default: sdk } = await import('@fullon/anchor-link');
   const app = await startLogin({ config, output: resolve(values.output), timeoutMs,
     assets: new URL('../', import.meta.url), exchange: (proof, cfg) => verifyAndExchange(proof, cfg, sdk) });

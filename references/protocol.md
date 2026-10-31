@@ -1,5 +1,7 @@
 # 配置与协议
 
+不传 `--config` 时读取 skill 目录的 `config.json`，其中保存从 `/Users/wudy/source/ai/cv-admin-webui/.env.prod` 提取的登录配置值。它是独立快照，不依赖原文件存在，也不会随原文件更新。可直接执行 `npm run login`；传入 `--config` 时完全使用指定文件。
+
 配置使用 JSON（扩展名 .json），例如：
 
 ```json

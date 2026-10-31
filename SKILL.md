@@ -7,9 +7,9 @@ description: 使用 HuFu 钱包扫码登录 Cisum 管理后台认证服务，为
 
 在本 skill 目录运行命令。客户端独立于管理后台，不需要源项目或钱包私钥。
 
-1. 确定用户需要的环境，读取指定配置；环境不明确时询问用户，不默认使用生产环境。配置格式和认证细节见 [协议参考](references/protocol.md)。
+1. 默认使用随 skill 提供的 `config.json`（提取自 cv-admin-webui 的 .env.prod 登录配置）。用户指定其他环境时，通过 `--config` 覆盖。配置格式和认证细节见 [协议参考](references/protocol.md)。
 2. 首次使用执行 `npm ci --ignore-scripts` 和 `npm run build`。使用 Node.js 20 或以上。
-3. 执行 `node scripts/login.mjs --config <配置绝对路径> --output <会话绝对路径>`。默认等待 300 秒，可用 `--timeout` 修改。
+3. 执行 `node scripts/login.mjs --output <会话绝对路径>`。默认等待 300 秒，可用 `--timeout` 修改。
 4. 打开终端输出的本机 URL，点击“显示登录二维码”，让用户使用 HuFu 扫码并确认。保持客户端运行直到成功、取消或超时。远程执行环境的 loopback URL 只在执行机器可访问。
 5. 以退出码 0 和成功结果中的会话文件为完成标准。只向用户报告账户和会话路径。后续获授权的 API 请求从文件读取 token，使用 `Authorization: Bearer <token>`；不把 token 放进聊天、日志或命令参数。
 
