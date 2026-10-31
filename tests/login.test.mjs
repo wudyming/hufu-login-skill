@@ -95,3 +95,20 @@ test('configuration supports JSON and source dotenv keys', async () => {
     await writeFile(json, '{}'); await assert.rejects(readConfig(json));
   } finally { await rm(dir, { recursive: true, force: true }); }
 });
+test('account filenames isolate users and support custom directories and paths', async () => {
+  const { sessionPath } = await import('../scripts/core.mjs');
+  const dir = await mkdtemp(join(tmpdir(), 'cv-login-'));
+  try {
+    const alice = sessionPath('alice', { outputDir: dir });
+    const bob = sessionPath('bob', { outputDir: dir });
+    assert.equal(alice, join(dir, 'alice.json'));
+    await saveSession(alice, { account: 'alice', token: 'old' });
+    await saveSession(bob, { account: 'bob', token: 'bob-token' });
+    await saveSession(alice, { account: 'alice', token: 'new' });
+    assert.equal(JSON.parse(await readFile(alice)).token, 'new');
+    assert.equal(JSON.parse(await readFile(bob)).token, 'bob-token');
+    assert.equal(sessionPath('alice', { output: join(dir, 'custom.json') }), join(dir, 'custom.json'));
+    assert.match(sessionPath('alice'), /sessions\/alice\.json$/);
+    for (const invalid of ['../bad', '..', '', '/alice']) assert.throws(() => sessionPath(invalid));
+  } finally { await rm(dir, { recursive: true, force: true }); }
+});

@@ -1,9 +1,9 @@
 import { readFile, open, mkdir, rename, unlink } from 'node:fs/promises';
-import { dirname } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 
-export async function readConfig(path = fileURLToPath(new URL('../config.json', import.meta.url))) {
+export async function readConfig(path = fileURLToPath(new URL('../config.prod.json', import.meta.url))) {
   const raw = await readFile(path, 'utf8');
   const data = path.endsWith('.json') ? JSON.parse(raw) : Object.fromEntries(
     raw.split(/\r?\n/).filter(line => /^\s*(?:export\s+)?[A-Z_]+=/.test(line))
@@ -55,4 +55,11 @@ export async function saveSession(path, session) {
     try { await file.writeFile(JSON.stringify(session, null, 2) + '\n'); } finally { await file.close(); }
     await rename(temporary, path);
   } finally { await unlink(temporary).catch(() => {}); }
+}
+
+export function sessionPath(account, { output, outputDir = 'sessions' } = {}) {
+  if (typeof account !== 'string' || !/^[a-z1-5.]{1,13}$/.test(account) || !/[a-z1-5]/.test(account)) {
+    throw new Error('无效账户名，无法保存会话');
+  }
+  return output ? resolve(output) : resolve(outputDir, `${account}.json`);
 }

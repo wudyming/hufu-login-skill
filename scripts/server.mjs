@@ -1,9 +1,9 @@
 import { createServer } from 'node:http';
 import { randomBytes } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
-import { saveSession } from './core.mjs';
+import { saveSession, sessionPath } from './core.mjs';
 
-export async function startLogin({ config, output, timeoutMs = 300000, exchange, assets }) {
+export async function startLogin({ config, output, outputDir, timeoutMs = 300000, exchange, assets }) {
   const secret = randomBytes(32).toString('hex');
   let origin, busy = false, finished = false, timer;
   let resolveDone;
@@ -35,8 +35,9 @@ export async function startLogin({ config, output, timeoutMs = 300000, exchange,
       if (typeof proof !== 'string' || !proof) throw new Error('缺少身份凭证');
       const session = await exchange(proof, config);
       if (finished) return json(410, { error: '登录已结束' });
-      await saveSession(output, session);
-      json(200, { account: session.account }); finish({ ok: true, account: session.account, output });
+      const path = sessionPath(session.account, { output, outputDir });
+      await saveSession(path, session);
+      json(200, { account: session.account }); finish({ ok: true, account: session.account, output: path });
     } catch {
       json(400, { error: '身份验证或认证请求失败，请检查配置和网络后重试' });
       finish({ ok: false, error: '身份验证或认证请求失败（凭证无效、认证服务或网络异常）' });
