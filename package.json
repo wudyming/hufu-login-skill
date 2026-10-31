@@ -1,0 +1,1 @@
+{"name":"cv-hufu-login","private":true,"type":"module","scripts":{"build":"esbuild assets/login.js --bundle --format=esm --platform=browser --outfile=dist/login.js","login":"node scripts/login.mjs","test":"node --test tests/*.test.mjs"},"dependencies":{"@fullon/anchor-link":"1.0.3","@fullon/anchor-link-browser-transport":"1.0.7"},"devDependencies":{"esbuild":"^0.25.0"}}

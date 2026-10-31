@@ -1,0 +1,4 @@
+interface:
+  display_name: "HuFu 扫码登录"
+  short_description: "使用独立客户端扫码获取 Cisum 后台 API 会话，支持过期后重新认证"
+  default_prompt: "使用 $cv-hufu-login 为我扫码登录指定环境并保存后台 API 会话。"
